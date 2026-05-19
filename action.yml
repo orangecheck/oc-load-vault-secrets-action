@@ -1,0 +1,46 @@
+name: 'Load OC Vault secrets'
+description: 'Resolve ocv:// secret references from OC Vault into a GitHub Actions job. Zero-knowledge — decryption happens on the runner.'
+author: 'OrangeCheck'
+
+branding:
+    icon: 'lock'
+    color: 'orange'
+
+inputs:
+    token:
+        description: 'An OC Vault access token (ocvt_…). Mint one at vault.ochk.io/vault/developer.'
+        required: true
+    passphrase:
+        description: 'Your vault passphrase. Decryption happens on the runner; OrangeCheck never receives it.'
+        required: true
+    env-file:
+        description: 'Optional path to a .env file of KEY=ocv://… references. Without it, any job env var whose value is an ocv:// reference is resolved.'
+        required: false
+        default: ''
+    cli-version:
+        description: 'The @orangecheck/vault-cli semver range to install.'
+        required: false
+        default: '^0.2'
+
+runs:
+    using: 'composite'
+    steps:
+        - name: Resolve OC Vault secrets
+          shell: bash
+          env:
+              OCV_PASSPHRASE: ${{ inputs.passphrase }}
+              OCV_INPUT_TOKEN: ${{ inputs.token }}
+              OCV_INPUT_ENV_FILE: ${{ inputs.env-file }}
+              OCV_CLI_VERSION: ${{ inputs.cli-version }}
+          run: |
+              set -euo pipefail
+              npm install -g "@orangecheck/vault-cli@${OCV_CLI_VERSION}" >/dev/null 2>&1
+              # `login` caches only ciphertext (the escrow + blobs) on the runner.
+              oc-vault login --token "${OCV_INPUT_TOKEN}" >/dev/null
+              # `export --github` resolves every ocv:// reference in one vault
+              # open, writes the values to $GITHUB_ENV, and masks them in logs.
+              if [ -n "${OCV_INPUT_ENV_FILE}" ]; then
+                  oc-vault export --env-file "${OCV_INPUT_ENV_FILE}" --github
+              else
+                  oc-vault export --github
+              fi

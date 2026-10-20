@@ -55,7 +55,7 @@ Or point at a committed `.env` file of references:
 2. Add it as the `OCV_TOKEN` repository secret, and your vault passphrase as
    `OCV_PASSPHRASE`.
 3. Reference secrets as `ocv://personal/<item>/<field>` — see the
-   [`ocv://` syntax](https://docs.ochk.io/vault/developer).
+   [`ocv://` syntax](https://ochk.io/docs/vault/developer).
 
 Resolved values are registered as masked secrets, so they are redacted in
 job logs.

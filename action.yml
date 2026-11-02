@@ -18,9 +18,9 @@ inputs:
         required: false
         default: ''
     cli-version:
-        description: 'The @orangecheck/vault-cli semver range to install.'
+        description: 'The @orangecheck/vault-cli semver range to install. 0.3.3 is the first that masks every line of a multi-line secret.'
         required: false
-        default: '^0.2'
+        default: '^0.3.3'
 
 runs:
     using: 'composite'

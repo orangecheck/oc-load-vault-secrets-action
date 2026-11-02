@@ -47,7 +47,7 @@ Or point at a committed `.env` file of references:
 | `token` | yes | An OC Vault access token (`ocvt_…`). Mint one at **vault.ochk.io/vault/developer**. |
 | `passphrase` | yes | Your vault passphrase. Decrypts the vault on the runner. |
 | `env-file` | no | A `.env` file of `KEY=ocv://…` references. Without it, any job env var whose value is an `ocv://` reference is resolved. |
-| `cli-version` | no | The `@orangecheck/vault-cli` range to install. Default `^0.2`. See [Multi-line secrets](#multi-line-secrets) before relying on it. |
+| `cli-version` | no | The `@orangecheck/vault-cli` range to install. Default `^0.3.3`. Keep it at 0.3.3 or later: earlier versions leak multi-line secrets (see below). |
 
 ## Setup
 
@@ -57,22 +57,16 @@ Or point at a committed `.env` file of references:
 3. Reference secrets as `ocv://personal/<item>/<field>` — see the
    [`ocv://` syntax](https://ochk.io/docs/vault/developer).
 
-Resolved values are registered as masked secrets, so they are redacted in
-job logs. A multi-line value is the exception until vault-cli 0.3.3.
+Resolved values are registered as masked secrets, one mask for each line of
+every value, so they are redacted in job logs.
 
-## Multi-line secrets
-
-GitHub masks one line at a time. vault-cli masks every line of a multi-line
-value, such as a PEM or SSH key, only from 0.3.3. Versions 0.2.0 through
-0.3.1, including the 0.2.0 that this action's default `^0.2` installs, mask
-the first line and print the rest into the job log in clear.
-
-This action's default moves to 0.3.3 in its next release. Until then, don't
-load multi-line secrets with it. Once vault-cli 0.3.3 is on npm, you can set
-`cli-version: '^0.3.3'` to get the fix sooner.
-
-**If this action loaded a multi-line secret with vault-cli 0.2.0–0.3.1, rotate
-that secret and delete the affected run logs.**
+**Multi-line secrets before vault-cli 0.3.3.** GitHub masks one line at a
+time. vault-cli 0.2.x through 0.3.1 masked only the first line of a
+multi-line secret, such as a PEM or SSH key, and the rest of it reached the
+job log in clear. This action's default was `^0.2`, which stayed on those
+versions. It is now `^0.3.3`. If this action loaded a multi-line secret
+before, or you pin `cli-version` below 0.3.3, rotate that secret and delete
+the affected run logs.
 
 ## License
 

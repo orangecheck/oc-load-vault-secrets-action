@@ -71,6 +71,9 @@ This action's default moves to 0.3.3 in its next release. Until then, don't
 load multi-line secrets with it. Once vault-cli 0.3.3 is on npm, you can set
 `cli-version: '^0.3.3'` to get the fix sooner.
 
+**If this action loaded a multi-line secret with vault-cli 0.2.0–0.3.1, rotate
+that secret and delete the affected run logs.**
+
 ## License
 
 MIT © OrangeCheck

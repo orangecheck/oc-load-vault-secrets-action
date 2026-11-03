@@ -47,7 +47,7 @@ Or point at a committed `.env` file of references:
 | `token` | yes | An OC Vault access token (`ocvt_…`). Mint one at **vault.ochk.io/vault/developer**. |
 | `passphrase` | yes | Your vault passphrase. Decrypts the vault on the runner. |
 | `env-file` | no | A `.env` file of `KEY=ocv://…` references. Without it, any job env var whose value is an `ocv://` reference is resolved. |
-| `cli-version` | no | The `@orangecheck/vault-cli` range to install. Default `^0.2`. |
+| `cli-version` | no | The `@orangecheck/vault-cli` range to install. Default `^0.2`. See [Multi-line secrets](#multi-line-secrets) before relying on it. |
 
 ## Setup
 
@@ -58,7 +58,18 @@ Or point at a committed `.env` file of references:
    [`ocv://` syntax](https://ochk.io/docs/vault/developer).
 
 Resolved values are registered as masked secrets, so they are redacted in
-job logs.
+job logs. A multi-line value is the exception until vault-cli 0.3.3.
+
+## Multi-line secrets
+
+GitHub masks one line at a time. vault-cli masks every line of a multi-line
+value, such as a PEM or SSH key, only from 0.3.3. Versions 0.2.0 through
+0.3.1, including the 0.2.0 that this action's default `^0.2` installs, mask
+the first line and print the rest into the job log in clear.
+
+This action's default moves to 0.3.3 in its next release. Until then, don't
+load multi-line secrets with it. Once vault-cli 0.3.3 is on npm, you can set
+`cli-version: '^0.3.3'` to get the fix sooner.
 
 ## License
 
